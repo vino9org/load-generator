@@ -10,12 +10,7 @@ license = "MIT"
 [tool.poetry.dependencies]
 python = "^3.9"
 boto3 = "1.21.4"
-aws-lambda-powertools = "^1.24.2"
-aws-cdk-lib = "^2.13.0"
-constructs = "10.*"
 pytest = "^6.2.5"
-pytest-mock = "^3.5.1"
-pytest-cov = "^3.0.0"
 
 # this is used by tests/integration/conftest.py to create IAM auth fixtures
 # if IAM auth is not required, it can be removed
@@ -46,21 +41,12 @@ boto3-stubs = "1.21.4"
 [tool.isort]
 profile = "black"
 line_length = 120
-src_paths = ["runtime", "infrastructure", "tests"]
 
 [tool.black]
 line-length = 120
 
 [tool.pytest.ini_options]
 minversion = "6.0"
-# addopts = "--cov=runtime --cov-report html --cov-report xml"
 testpaths = [
     "tests",
 ]
-
-[tool.coverage.run]
-source = ["runtime"]
-omit = ["tests/*", "infrastructure/*"]
-
-[tool.coverage.html]
-directory = "test_report"
