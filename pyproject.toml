@@ -15,6 +15,7 @@ pytest = "^6.2.5"
 # this is used by tests/integration/conftest.py to create IAM auth fixtures
 # if IAM auth is not required, it can be removed
 requests-aws4auth = "^1.1.1"
+locust = "^2.8.3"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
