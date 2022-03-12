@@ -16,20 +16,9 @@ $ poetry shell
 
 ```
 
-## Develop the code for the stack
+## Run load test
 ```
-# run unit tests
-pytest
-
-# use cdk to deploy infrastructure
-# ensure your AWS credentials are set, then
-cdk synth
-cdk deploy
+locust
 
 ```
 
-## push to Github
-```
-poetry export -o requirements.txt
-# push to feature branches and develop branch will trigger pipeline run
-git push ...

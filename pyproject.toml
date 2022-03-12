@@ -10,12 +10,9 @@ license = "MIT"
 [tool.poetry.dependencies]
 python = "^3.9"
 boto3 = "1.21.4"
-pytest = "^6.2.5"
-
-# this is used by tests/integration/conftest.py to create IAM auth fixtures
-# if IAM auth is not required, it can be removed
 requests-aws4auth = "^1.1.1"
 locust = "^2.8.3"
+pytest = "^7.0.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
