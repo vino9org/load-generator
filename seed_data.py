@@ -32,6 +32,10 @@ TEST_IDS = [
 ]
 
 
+def get_all_ids() -> List[Tuple[str, str]]:
+    return TEST_IDS
+
+
 def rand_cust_n_account_ids(count: int = 10) -> List[Tuple[str, str]]:
     return [(ulid.ulid(), rand_account_id()) for n in range(0, count)]
 
