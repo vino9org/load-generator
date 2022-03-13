@@ -5,10 +5,18 @@ from botocore.exceptions import ClientError
 from requests_aws4auth import AWS4Auth
 
 
+def limits_table_name(stack_name: str = "LimitsStack-develop", region: str = "us-west-2") -> str:
+    return _stack_outputs_for_key_(stack_name, "LimitsTableName", region)
+
+
 def limits_api(stack_name: str = "LimitsStack-develop", region: str = "us-west-2") -> Tuple[str, AWS4Auth]:
     url = _stack_outputs_for_key_(stack_name, "RestApiEndpoint", region)
     auth = _iam_auth_for_service_("execute-api", region)
     return url, auth
+
+
+def accounts_table_name(stack_name: str = "AccountsApiStack-develop", region: str = "us-west-2") -> str:
+    return _stack_outputs_for_key_(stack_name, "AccountsTableName", region)
 
 
 def accounts_api(stack_name: str = "AccountsApiStack-develop", region: str = "us-west-2") -> Tuple[str, AWS4Auth]:
