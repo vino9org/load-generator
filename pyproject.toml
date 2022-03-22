@@ -13,7 +13,7 @@ boto3 = "1.21.4"
 requests-aws4auth = "^1.1.1"
 locust = "^2.8.3"
 pytest = "^7.0.1"
-ulid = "^1.1"
+ulid-py = "^1.1.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
