@@ -68,8 +68,8 @@ def seed_limits_table() -> None:
                     Item={
                         "customer_id": item["cust_id"],
                         "request_id": "9" * 26,
-                        "avail_amount": item["limit"],
-                        "max_amount": item["limit"],
+                        "avail_amount": Decimal(item["limit"]),
+                        "max_amount": Decimal(item["limit"]),
                         "updated_at": now,
                     }
                 )
