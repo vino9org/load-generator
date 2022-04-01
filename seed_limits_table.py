@@ -2,7 +2,7 @@ import csv
 import os
 from datetime import datetime
 from decimal import Decimal
-from typing import Any, Dict, List
+from typing import Any, Dict, Generator, List
 
 import boto3
 from botocore.exceptions import ClientError
@@ -46,9 +46,9 @@ def stack_outputs_for_key(key: str) -> List[str]:
 
 
 def seed_limits_table() -> None:
-    limits_table = stack_outputs_for_key("LimitsTableName")
+    limits_table_name = stack_outputs_for_key("LimitsTableName")
     ddb = boto3.resource("dynamodb")
-    limits_table = ddb.Table(limits_table)
+    limits_table = ddb.Table(limits_table_name)
 
     flag = True
     while flag:
@@ -75,7 +75,7 @@ def seed_limits_table() -> None:
                 )
 
 
-def read_seed_data(count: int = 100) -> List[Dict[str, Any]]:
+def read_seed_data(count: int = 100) -> Generator[List[Dict[str, Any]], None, None]:
     """return records in seed data file in batch of count records at a time"""
     result = []
     with open("seed.csv", "r") as in_f:
