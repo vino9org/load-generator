@@ -1,57 +1,56 @@
 import random
+from datetime import datetime
+from typing import Any, Tuple
 
 from locust import HttpUser, between, run_single_user, tag, task
 
-import seed_data
-import utils
+from seed_limits_table import read_seed_data
 
-limits_api_url, limits_auth = utils.limits_api()
-accounts_api_url, accounts_auth = utils.accounts_api()
+_all_ids_: list[Tuple[str, str]] = []
 
 
-def pick_cust_id() -> str:
-    ids = seed_data.get_all_ids()
-    index = random.randrange(0, len(ids))
-    cust_id, _ = ids[index]
-    return cust_id
+def all_ids() -> list[Tuple[str, str]]:
+    global _all_ids_
+    if not _all_ids_:
+        for items in read_seed_data():
+            for item in items:
+                _all_ids_.append((item["acc_id"], item["cust_id"]))
+        print(f"loaded {len(_all_ids_)} account numbers from seed data")
+    return _all_ids_
 
 
-def accounts_query(customer_id: str) -> str:
-    return """
-    query accounts_query {
-        getAccountsForCustomer(
-            customerId: "%s"
-        ) {
-            id
-            sid
-            avail_balance
-            currency
-        }
+def rand_account() -> Tuple[str, str]:
+    return random.choice(all_ids())
+
+
+def rand_fund_transfer_request() -> dict[str, Any]:
+    rand_amount = round(random.uniform(1.00, 100.10), 2)
+    debit_acc_id, debit_cust_id = rand_account()
+    credit_acc_id, _ = rand_account()
+    if debit_acc_id == credit_acc_id:
+        credit_acc_id, _ = rand_account()
+    return {
+        "debit_customer_id": debit_cust_id,
+        "debit_account_id": debit_acc_id,
+        "credit_account_id": credit_acc_id,
+        "amount": rand_amount,
+        "currency": "SGD",
+        "memo": "generated from locust",
+        "transaction_date": datetime.now().strftime("%Y-%m-%d"),
     }
-    """ % (
-        customer_id
-    )
 
 
 class ApiUser(HttpUser):
-    wait_time = between(0.5, 2)
-    host = "127.0.0.1:80"  # dummy value, not used in tests
+    wait_time = between(3, 10)
 
     @tag("rest")
     @task
-    def call_limits_api(self):
-        self.client.post(
-            url=f"{limits_api_url}/customers/{pick_cust_id()}/limits",
-            json={"req_amount": 1000},
-            auth=limits_auth,
-            name="/customers/CUST_ID/limits",
+    def call_fund_transfer_api(self):
+        return self.client.post(
+            url="/transfers",
+            headers={"content-type": "application/json"},
+            json=rand_fund_transfer_request(),
         )
-
-    @tag("graphql")
-    @task
-    def call_accounts_api(self):
-        query = accounts_query(pick_cust_id())
-        self.client.post(url=accounts_api_url, json={"query": query}, auth=accounts_auth)
 
 
 if __name__ == "__main__":

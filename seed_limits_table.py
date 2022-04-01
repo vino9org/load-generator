@@ -36,7 +36,7 @@ def stack_outputs_for_key(key: str) -> List[str]:
     try:
         response = client.describe_stacks(StackName=stack_name)
         stack_outputs = response["Stacks"][0]["Outputs"]
-        output_values = [item["OutputValue"] for item in stack_outputs if key in item["OutputKey"]]  # type: ignore
+        output_values = [item["OutputValue"] for item in stack_outputs if key in item["OutputKey"]]
         if not output_values:
             raise Exception(f"There is no output with key {key} in stack {stack_name} in region {region}")
 

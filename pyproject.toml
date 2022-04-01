@@ -14,6 +14,7 @@ requests-aws4auth = "^1.1.1"
 locust = "^2.8.3"
 pytest = "^7.0.1"
 ulid-py = "^1.1.0"
+types-requests = "^2.27.15"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
