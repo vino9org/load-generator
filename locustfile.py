@@ -1,8 +1,16 @@
+from gevent import monkey
+
+# must do this first in order to prevent ssl related errors down the road
+monkey.patch_all()  # noqa
+
+import os
 import random
 from datetime import datetime
 from typing import Any, Tuple
 
-from locust import HttpUser, between, run_single_user, tag, task
+import boto3
+from locust import HttpUser, between, run_single_user, tag, task  # fmt: off noqa
+from requests_aws4auth import AWS4Auth
 
 from seed_limits_table import read_seed_data
 
@@ -40,18 +48,55 @@ def rand_fund_transfer_request() -> dict[str, Any]:
     }
 
 
+def account_query(acc_id: str) -> str:
+    return (
+        " query locust {"
+        f"  getTransactionsForAccount(accountId: '{acc_id}') "
+        "    { id sid amount currency memo status transaction_date }"
+        "}"
+    )
+
+
+def iam_auth_for_service(service: str) -> AWS4Auth:
+    session = boto3.Session()
+    credentials = session.get_credentials()
+    return AWS4Auth(
+        credentials.access_key,
+        credentials.secret_key,
+        session.region_name,
+        service,
+    )
+
+
 class ApiUser(HttpUser):
-    wait_time = between(3, 10)
+    wait_time = between(2, 5)
 
     @tag("rest")
-    @task
+    @task(weight=3)
     def call_fund_transfer_api(self):
+        request = rand_fund_transfer_request()
+        self.last_account = request["debit_account_id"]
         return self.client.post(
             url="/transfers",
             headers={"content-type": "application/json"},
             json=rand_fund_transfer_request(),
         )
 
+    @tag("graphql")
+    @task(weight=1)
+    def call_account_query_api(self):
+        graphql_endpoint = os.environ.get(
+            "ACCOUNT_INQUERY_URL", "https://pfl7nvl7xvfulnc2je6hjr35sm.appsync-api.us-west-2.amazonaws.com"
+        )
+        auth = iam_auth_for_service("appsync")
+        query = account_query(self.last_account)
+        return self.client.post(
+            url=f"{graphql_endpoint}/graphql",
+            json={"query": query},
+            auth=auth,
+        )
+
 
 if __name__ == "__main__":
+    print(account_query())
     run_single_user(ApiUser)
