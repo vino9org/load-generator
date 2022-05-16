@@ -1,7 +1,10 @@
 from gevent import monkey
 
 # must do this first in order to prevent ssl related errors down the road
-monkey.patch_all()  # noqa
+# ignore the warning resulted from running the patch before import
+# flake8: noqa E402
+
+monkey.patch_all()
 
 import os
 import random
@@ -88,15 +91,21 @@ class ApiUser(HttpUser):
         graphql_endpoint = os.environ.get(
             "ACCOUNT_INQUERY_URL", "https://pfl7nvl7xvfulnc2je6hjr35sm.appsync-api.us-west-2.amazonaws.com"
         )
-        auth = iam_auth_for_service("appsync")
-        query = account_query(self.last_account)
+
+        try:
+            query_account = account_query(self.last_account_2)
+        except AttributeError:
+            # last_account is not defined either due to order to execution or
+            # calling transfer failed
+            _, query_account = rand_account()
+            print(f"...using random account {query_account} for query")
+
         return self.client.post(
             url=f"{graphql_endpoint}/graphql",
-            json={"query": query},
-            auth=auth,
+            json={"query": account_query(query_account)},
+            auth=iam_auth_for_service("appsync"),
         )
 
 
 if __name__ == "__main__":
-    print(account_query())
     run_single_user(ApiUser)
