@@ -1,13 +1,10 @@
 
-# Welcome to your CDK Python project!
-
-This project is set up like Python project using poetry package manager. 
-
-The `cdk.json` file tells the CDK Toolkit how to execute your app.
+# Load generator for Vino Bank demo
 
 
 ## Setup
-```
+
+```shell
 # create virtualenv
 $ poetry shell
 
@@ -17,13 +14,18 @@ $ poetry shell
 ```
 
 ## Run load test
-```
+
+```shell
 locust
+
+# run rest call headless
+locust --tags rest --host http://pie4.lan --users 10 --spawn-rate 5 --headless --run-time 5m
 
 ```
 
 ## Send single request for testing
-```
+
+```shell
 
 # get help 
 python single.py --help

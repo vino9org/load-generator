@@ -4,6 +4,7 @@ from typing import Any, Tuple
 
 import boto3
 from requests_aws4auth import AWS4Auth
+from ulid import ULID
 
 from seed_limits_table import read_seed_data
 
@@ -15,7 +16,7 @@ def all_ids() -> list[Tuple[str, str]]:
     if not _all_ids_:
         for items in read_seed_data():
             for item in items:
-                _all_ids_.append((item["acc_id"], item["cust_id"]))
+                _all_ids_.append((item["account_id"], item["customer_id"]))
         print(f"loaded {len(_all_ids_)} account numbers from seed data")
     return _all_ids_
 
@@ -44,6 +45,7 @@ def fund_transfer_request(
         "currency": "SGD",
         "memo": memo if memo else "generated from locust",
         "transaction_date": datetime.now().strftime("%Y-%m-%d"),
+        "ref_id": str(ULID()),
     }
 
 
