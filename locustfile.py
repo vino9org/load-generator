@@ -11,21 +11,22 @@ monkey.patch_all()
 import os
 from typing import Any, Tuple
 
-from locust import HttpUser, between, run_single_user, tag, task  # fmt: off noqa
+from locust import FastHttpUser, between, run_single_user, tag, task  # fmt: off noqa
 
 from api_utils import account_query, iam_auth_for_service, rand_account, rand_fund_transfer_request
 
 
-class ApiUser(HttpUser):
-    wait_time = between(2, 5)
+class ApiUser(FastHttpUser):
+    #    wait_time = between(2, 5)
 
     @tag("rest")
     @task(weight=3)
     def call_fund_transfer_api(self):
         request = rand_fund_transfer_request()
         self.last_account = request["debit_account_id"]
+        url = "/core-banking/local-transfers" if os.environ.get("USE_COREBANKING") == "1" else "/transfers"
         return self.client.post(
-            url="/transfers",
+            url=url,
             headers={"content-type": "application/json"},
             json=rand_fund_transfer_request(),
         )
