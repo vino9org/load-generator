@@ -53,9 +53,7 @@ def do_transfer(transfer: dict[str, Any]) -> bool:
     pprint.pprint(transfer)
     print()
 
-    rest_endpoint = os.environ.get(
-        "ACCOUNT_TRANSFER_URL", "http://a62f4b0cb4c6e48b4afe48863ed2f921-519988285.us-west-2.elb.amazonaws.com:8080"
-    )
+    rest_endpoint = os.environ.get("ACCOUNT_TRANSFER_URL", "http://192.168.1.204/vinobank-dev")
 
     response = requests.post(
         url=f"{rest_endpoint}/transfers",
