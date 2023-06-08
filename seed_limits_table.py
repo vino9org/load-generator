@@ -77,8 +77,9 @@ def seed_limits_table() -> None:
 
 def read_seed_data(count: int = 100) -> Generator[List[Dict[str, Any]], None, None]:
     """return records in seed data file in batch of count records at a time"""
+    seed_data_file = os.environ.get("SEED_DATA_FILE", "seed.csv")
     result = []
-    with open("seed.csv", "r") as in_f:
+    with open(seed_data_file, "r") as in_f:
         reader = csv.DictReader(in_f)
         for row in reader:
             result.append(row)
