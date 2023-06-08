@@ -11,13 +11,28 @@ monkey.patch_all()
 import os
 from typing import Any, Tuple
 
-from locust import FastHttpUser, between, run_single_user, tag, task  # fmt: off noqa
+from locust import FastHttpUser, events, run_single_user, tag, task
 
 from api_utils import account_query, iam_auth_for_service, rand_account, rand_fund_transfer_request
 
 
+@events.init_command_line_parser.add_listener
+def _(parser):
+    parser.add_argument("--wait-time", type=str, dest="wait_time", default="0", help="wait time between requests")
+
+
+@events.test_start.add_listener
+def _(environment, **kw):
+    print(f"Custom argument supplied: {environment.parsed_options.my_argument}")
+
+
+def custom_wait_time_function(locust):
+    wait_time = locust.environment.parsed_options.wait_time
+    return float(wait_time)
+
+
 class ApiUser(FastHttpUser):
-    #    wait_time = between(2, 5)
+    wait_time = custom_wait_time_function
 
     @tag("rest")
     @task(weight=3)

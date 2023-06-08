@@ -16,7 +16,9 @@ $ poetry shell
 ## Run load test
 
 ```shell
-locust
+
+# launch Web UI with wait time
+locust --tags rest --host http://pie4.lan --wait-time 5 --users 1
 
 # run rest call headless
 locust --tags rest --host http://pie4.lan --users 10 --spawn-rate 5 --headless --run-time 5m
@@ -27,7 +29,7 @@ locust --tags rest --host http://pie4.lan --users 10 --spawn-rate 5 --headless -
 
 ```shell
 
-# get help 
+# get help
 python single.py --help
 
 # queries account transaction history from the GraphQL endpoint
