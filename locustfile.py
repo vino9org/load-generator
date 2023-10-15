@@ -23,7 +23,7 @@ def _(parser):
 
 @events.test_start.add_listener
 def _(environment, **kw):
-    print(f"Custom argument supplied: {environment.parsed_options.my_argument}")
+    print(f"Custom argument supplied: {environment.parsed_options.wait_time}")
 
 
 def custom_wait_time_function(locust):
